@@ -1,32 +1,30 @@
-FROM ubuntu:20.04
+FROM alpine:3.21.0
 
-ARG RUNNER_VERSION="2.317.0"
-ARG DEBIAN_FRONTEND=noninteractive
+ARG RUNNER_VERSION="2.321.0"
+ARG RUNNER_VERSION_CHECKSUM="ba46ba7ce3a4d7236b16fbe44419fb453bc08f866b24f04d549ec89f1722a29e"
 
 # Update and upgrade the system
-RUN apt update -y && apt upgrade -y
+RUN apk update && \
+    apk add --no-cache \
+    ca-certificates \
+    curl \
+    sudo \
+    unzip \
+    iputils
 
-# Add a user named docker
-RUN useradd -m docker
+# Working directory
+WORKDIR /runner
 
-# Install necessary packages
-RUN apt install -y --no-install-recommends \
-    curl build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip jq
-RUN apt-get -yqq install ssh
-# Set up the actions runner
-RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
-    && curl -o actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
-    && tar xzf actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
 
-# Change ownership to docker user and install dependencies
-RUN chown -R docker /home/docker && /home/docker/actions-runner/bin/installdependencies.sh
+RUN curl -o actions-runner.tar.gz -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
+    && echo "${RUNNER_VERSION_CHECKSUM} actions-runner.tar.gz" | sha256sum -c - \
+    && tar xzf ./actions-runner.tar.gz \
+    && rm actions-runner.tar.gz
 
-# Copy the start script and make it executable
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
 
-# Switch to docker user
-USER docker
+# Copy entrypoint script and make it executable
+COPY start.sh .
+RUN chmod +x ./start.sh
 
-# Define the entrypoint
-ENTRYPOINT ["/start.sh"]
+# Configure the runner
+ENTRYPOINT ["./start.sh"]
