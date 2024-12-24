@@ -26,7 +26,7 @@ Welcome to the GitHub Self-Hosted Runner Dockerization repository. This project 
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/youssefbrr/self-hosted-runner.git
+    git clone https://github.com/henrikroschmann/self-hosted-runner.git
     cd self-hosted-runner
     ```
 
@@ -41,7 +41,7 @@ Welcome to the GitHub Self-Hosted Runner Dockerization repository. This project 
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/youssefbrr/self-hosted-runner.git
+    git clone https://github.com/henrikroschmann/self-hosted-runner.git
     cd self-hosted-runner
     ```
 
