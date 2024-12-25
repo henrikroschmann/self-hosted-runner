@@ -25,6 +25,9 @@ RUN curl -o actions-runner.tar.gz -L \
 COPY start.sh .
 RUN chmod +x start.sh
 
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
 # # Debugging step: confirm that start.sh is there
 # RUN ls -l /runner
 
