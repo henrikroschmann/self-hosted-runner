@@ -27,9 +27,9 @@ RUN curl -o actions-runner.tar.gz -L \
 COPY start.sh .
 RUN chmod +x start.sh
 
-# # Optionally create non-root user
-# RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-# RUN chown -R appuser:appgroup /runner
-# USER appuser
+# Optionally create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN chown -R appuser:appgroup /runner
+USER appuser
 
 ENTRYPOINT ["./start.sh"]
