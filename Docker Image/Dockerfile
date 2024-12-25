@@ -28,6 +28,8 @@ RUN chmod +x start.sh
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
+RUN chown -R appuser:appgroup /runner
+
 # # Debugging step: confirm that start.sh is there
 # RUN ls -l /runner
 
