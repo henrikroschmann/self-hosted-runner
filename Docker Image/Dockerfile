@@ -6,7 +6,7 @@ RUN apt-get update \
     curl \
     unzip \
     libicu-dev \
-    docker \
+    docker.io \
     apt-utils \
     iputils-ping \
     && apt-get clean \
