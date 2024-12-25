@@ -1,11 +1,12 @@
 #!/bin/bash
 
-REPO=$REPO
-REG_TOKEN=$REG_TOKEN
-NAME=$NAME
+# Expect environment variables to be passed at runtime:
+#   - REPO: GitHub org/repo URL
+#   - REG_TOKEN: GitHub Actions runner registration token
+#   - NAME: Name for this runner
 
+# Configure the runner
+./config.sh --url "$REPO" --token "$REG_TOKEN" --name "$NAME" --unattended --replace
 
-# Create the runner and start the configuration experience
-./config.sh --url $REPO_URL --token $REPO_TOKEN --name ${NAME}
-
+# Start the runner
 ./run.sh
