@@ -1,5 +1,10 @@
 FROM ubuntu:20.04
 
+ARG DOCKER_GID=999
+ARG RUNNER_VERSION="2.321.0"
+ARG RUNNER_VERSION_CHECKSUM="ba46ba7ce3a4d7236b16fbe44419fb453bc08f866b24f04d549ec89f1722a29e"
+
+# 1. Install packages
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -14,18 +19,17 @@ RUN apt-get update \
 
 WORKDIR /runner
 
-# Create a docker group with the same GID as on the host
-ARG DOCKER_GID=999  # <-- change to match your host!
-RUN groupadd -g $DOCKER_GID docker
+# 2. Remove existing 'docker' group (if present), then create a 'docker' group with DOCKER_GID
+RUN if getent group docker; then \
+      echo "Removing existing 'docker' group"; \
+      groupdel docker; \
+    fi \
+    && groupadd -g $DOCKER_GID docker
 
-# Create a non-root "runner" user, in the "docker" group
-# Using a fixed UID e.g., 1001 (any non-zero UID is okay)
+# 3. Create non-root 'runner' user with UID 1001 in group 'docker'
 RUN useradd -u 1001 -g docker -m runner
 
-# Install GitHub Runner
-ARG RUNNER_VERSION="2.321.0"
-ARG RUNNER_VERSION_CHECKSUM="ba46ba7ce3a4d7236b16fbe44419fb453bc08f866b24f04d549ec89f1722a29e"
-
+# 4. Download/Install GitHub Actions runner
 RUN curl -o actions-runner.tar.gz -L \
     "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz" \
  && echo "${RUNNER_VERSION_CHECKSUM}  actions-runner.tar.gz" | sha256sum -c - \
@@ -35,10 +39,10 @@ RUN curl -o actions-runner.tar.gz -L \
 COPY start.sh .
 RUN chmod +x start.sh
 
-# Make sure the runner user owns everything in /runner
+# 5. Change ownership of /runner to 'runner:docker'
 RUN chown -R runner:docker /runner
 
-# Switch to the non-root user
+# 6. Switch to non-root user
 USER runner
 
 ENTRYPOINT ["./start.sh"]
