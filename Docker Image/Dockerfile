@@ -8,6 +8,7 @@ RUN apt-get update \
     sudo \
     unzip \
     iputils-ping \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
@@ -26,7 +27,7 @@ RUN curl -o actions-runner.tar.gz -L \
 # Copy scripts
 COPY start.sh .
 RUN chmod +x start.sh
-
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 # Optionally create non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 RUN chown -R appuser:appgroup /runner
